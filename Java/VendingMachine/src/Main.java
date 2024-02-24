@@ -1,11 +1,8 @@
 import domain.Bottle;
 import domain.HotDrink;
 import domain.Product;
-import services.CoinDispenser;
-import services.Display;
-import services.Holder;
-import services.VendingMachine;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,24 +16,18 @@ public class Main {
         Product latte = new HotDrink(6, "Latte", 160.00, 1, 70);
         Product americano = new HotDrink(7, "Americano", 140.00, 1, 85);
 
-        List<Product> ourList = new ArrayList<>();
-        ourList.add(product1);
-        ourList.add(product2);
-        ourList.add(product3);
-        ourList.add(bottle1);
-        ourList.add(capuchino);
-        ourList.add(latte);
-        ourList.add(americano);
+        List<Product> productList = new ArrayList<>();
+        productList.add(product1);
+        productList.add(product2);
+        productList.add(product3);
+        productList.add(bottle1);
+        productList.add(capuchino);
+        productList.add(latte);
+        productList.add(americano);
 
-        Holder holder = new Holder();
-        Display display = new Display();
-        CoinDispenser coinDispenser = new CoinDispenser();
-
-        VendingMachine machine = new VendingMachine(holder, display, coinDispenser, ourList);
-
-        for (Product item : machine.getProducts()) {
-            System.out.println(item);
-        }
-
+        SwingUtilities.invokeLater(() -> {
+            MainFrame vendingMachineUI = new MainFrame(productList);
+            vendingMachineUI.setVisible(true);
+        });
     }
 }
