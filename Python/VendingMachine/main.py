@@ -1,16 +1,48 @@
-# This is a sample Python script.
+import sys
+from PyQt5.QtWidgets import QApplication
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+from typing import List
+from Domain.bottle import Bottle
+from Domain.product import Product
+from Services.coin_dispenser import CoinDispenser
+from Services.display import Display
+from Services.holder import Holder
+from Services.vending_machine import VendingMachine
+from main_frame import MainFrame
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+if __name__ == "__main__":
+    assort: List[Product] = []
+    item1 = Product(100, 1, "Lays")
+    item2 = Product(50, 2, "Cola")
+    item3 = Bottle(150, 3, "Mineral Water", 101, 1.5)
+
+    product1 = Product(1, "Lays", 132.55, 13)
+    product2 = Product(2, "Snikers", 52.10, 14)
+    product3 = Product(3, "Nuts", 49.55, 15)
+    bottle1 = Bottle(4, "CocaCola", 99.00, 5, 0.5)
+    capuchino = HotDrink(5, "Capuchino", 150.00, 1, 80)
+    latte = HotDrink(6, "Latte", 160.00, 1, 70)
+    americano = HotDrink(7, "Americano", 140.00, 1, 85);
+
+    assort.append(item1)
+    assort.append(item2)
+    assort.append(item3)
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+    hold1 = Holder(4, 4)
+    coinDesp = CoinDispenser(0)
+    disp = Display()
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    venMachine = VendingMachine(hold1, coinDesp, assort, disp)
+
+    for prod in venMachine.getProducts():
+        print(prod)
+
+
+    app = QApplication(sys.argv)
+    myFrame = MainFrame()
+    myFrame.show()
+    sys.exit(app.exec_())
+
+    #print("Hello, World!")
