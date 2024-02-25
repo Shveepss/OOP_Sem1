@@ -12,10 +12,11 @@ class MainFrame(QMainWindow):
         # Создание списка продуктов
         self.product_list = QListWidget()
         for product in products:
-            self.product_list.addItem(f"{product.name} - ${product.price}")
+            self.product_list.addItem(f"{product.name} - {product.price}₽")
 
         # Создание поля для ввода наличности
         self.money_field = QLineEdit()
+        self.money_field.setText("0.0")
 
         # Создание кнопки "купить товар"
         self.buy_button = QPushButton("Купить товар")
@@ -39,10 +40,10 @@ class MainFrame(QMainWindow):
             selected_item = self.product_list.currentItem().text()
             # Разбиваем строку, чтобы получить имя продукта и его цену
             product_name, product_price = selected_item.split(" - ")
-            product_price = float(product_price)
+            product_price = float(product_price.replace("₽", ""))
 
             # Получаем введенную сумму из поля для ввода
-            entered_money = float(self.money_field.text())
+            entered_money = float(self.money_field.text().replace(",", "."))
 
             # Проверяем, хватает ли денег для покупки товара
             if entered_money >= product_price:
