@@ -7,62 +7,57 @@ import java.awt.event.ActionListener;
 import java.util.List;
 
 public class MainFrame extends JFrame {
-    private JPanel productPanel;
+    private JList<String> productList;
     private JTextField moneyField;
     private JButton buyButton;
-    private JLabel selectedProductLabel;
-    private Product selectedProduct;
+    private DefaultListModel<String> listModel;
 
     public MainFrame(List<Product> products) {
         setTitle("Vending Machine");
-        setSize(600, 300);
+        setSize(400, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // Создаем панель для отображения продуктов
-        productPanel = new JPanel();
-        productPanel.setLayout(new GridLayout(products.size(), 2));
-
-        // Для каждого продукта создаем кнопку и добавляем ее на панель
+        // Создание списка продуктов
+        listModel = new DefaultListModel<>();
         for (Product product : products) {
-            JButton productButton = new JButton(product.getName());
-            productButton.setPreferredSize(new Dimension(50, 50)); // Не разобрался почему не срабатывает
-            JLabel priceLabel = new JLabel(product.getPrice() + "₽");
-            priceLabel.setHorizontalAlignment(SwingConstants.CENTER);
-
-            productButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    // Обрабатываем нажатие кнопки продукта
-                    selectedProduct = product;
-                    updateSelectedProductLabel();
-                }
-            });
-
-            // Добавляем кнопку и подпись на панель
-            productPanel.add(productButton);
-            productPanel.add(priceLabel);
+            listModel.addElement(product.getName() + " - $" + product.getPrice());
         }
+        productList = new JList<>(listModel);
 
+        // Создание поля для ввода наличности
         moneyField = new JTextField(10);
 
+        // Создание кнопки "купить товар"
         buyButton = new JButton("Купить товар");
+
+        // Расположение компонентов на интерфейсе
+        setLayout(new BorderLayout());
+        add(new JScrollPane(productList), BorderLayout.CENTER);
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.add(new JLabel("Введите сумму:"));
+        bottomPanel.add(moneyField);
+        bottomPanel.add(buyButton);
+        add(bottomPanel, BorderLayout.SOUTH);
+
+        // Обработка нажатия на кнопку "купить товар"
         buyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (selectedProduct != null) {
-                    double productPrice = selectedProduct.getPrice();
-                    double enteredMoney = 0.00;
+                int selectedIndex = productList.getSelectedIndex();
+                if (selectedIndex != -1) {
+                    String selectedItem = listModel.getElementAt(selectedIndex);
+                    // Разбиваем строку, чтобы получить имя продукта и его цену
+                    String[] parts = selectedItem.split(" - \\$");
+                    String productName = parts[0];
+                    double productPrice = Double.parseDouble(parts[1]);
 
-                    String moneyText = moneyField.getText();
-                    if (!moneyText.isEmpty()) {
-                        enteredMoney = Double.parseDouble(moneyText);
-                    } else {
-                        JOptionPane.showMessageDialog(MainFrame.this, "Введите сумму");
-                        return;
-                    }
+                    // Получаем введенную сумму из поля для ввода
+                    double enteredMoney = Double.parseDouble(moneyField.getText());
 
+                    // Проверяем, хватает ли денег для покупки товара
                     if (enteredMoney >= productPrice) {
-                        JOptionPane.showMessageDialog(MainFrame.this, "Вы купили " + selectedProduct.getName());
+                        JOptionPane.showMessageDialog(MainFrame.this, "Вы купили " + productName);
+                        // Обновляем баланс пользователя после покупки
                         moneyField.setText(String.valueOf(enteredMoney - productPrice));
                     } else {
                         JOptionPane.showMessageDialog(MainFrame.this, "Недостаточно средств");
@@ -73,32 +68,6 @@ public class MainFrame extends JFrame {
             }
         });
 
-        // Метка для отображения выбранного продукта
-        selectedProductLabel = new JLabel("Выбран: ");
-
-        // Располагаем компоненты на интерфейсе
-        setLayout(new BorderLayout());
-        add(productPanel, BorderLayout.CENTER);
-        JPanel bottomPanel = new JPanel();
-        bottomPanel.add(selectedProductLabel);
-        bottomPanel.add(new JLabel("Введите сумму:"));
-        bottomPanel.add(moneyField);
-        bottomPanel.add(buyButton);
-        add(bottomPanel, BorderLayout.SOUTH);
-
         setVisible(true);
-    }
-
-    private void updateSelectedProductLabel() {
-        if (selectedProduct != null) {
-            selectedProductLabel.setText(
-                    "Выбран: " +
-                    selectedProduct.getName() +
-                    " стоимостью: " +
-                    selectedProduct.getPrice()
-            );
-        } else {
-            selectedProductLabel.setText("Выбран: ");
-        }
     }
 }

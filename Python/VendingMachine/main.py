@@ -34,7 +34,6 @@ if __name__ == "__main__":
     assort.append(latte)
     assort.append(americano)
 
-
     hold1 = Holder(4, 4)
     coinDesp = CoinDispenser(0)
     disp = Display()
@@ -44,10 +43,7 @@ if __name__ == "__main__":
     for prod in venMachine.getProducts():
         print(prod)
 
-
     app = QApplication(sys.argv)
-    myFrame = MainFrame()
-    myFrame.show()
+    vending_machine = MainFrame(venMachine.getProducts())
+    vending_machine.show()
     sys.exit(app.exec_())
-
-    #print("Hello, World!")

@@ -1,67 +1,55 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QWidget
-from PyQt5.QtGui import QFont
-import sys
+from PyQt5.QtWidgets import QApplication, QMainWindow, QListWidget, QLineEdit, QPushButton, QVBoxLayout, QMessageBox, \
+    QWidget
+
 
 class MainFrame(QMainWindow):
-    def __init__(self):
+    def __init__(self, products):
         super().__init__()
 
+        self.setWindowTitle("Vending Machine")
+        self.setFixedSize(400, 300)
 
-        self.setWindowTitle("VendingMachines")
-        self.setMaximumSize(300, 400)
-        
-        self.mainFont = QFont("Segoe print", 18, QFont.Bold)
-        
-        self.tfFirstName = QLineEdit()
-        self.tfFirstName.setFont(self.mainFont)
-        
-        self.tfLastName = QLineEdit()
-        self.tfLastName.setFont(self.mainFont)
-        
-        self.lbWelcome = QLabel()
-        self.lbWelcome.setFont(self.mainFont)
-        
-        self.btnOk = QPushButton("Ok")
-        self.btnOk.setFont(self.mainFont)
-        self.btnOk.clicked.connect(self.on_ok_clicked)
-        
-        self.btnClear = QPushButton("Clear")
-        self.btnClear.setFont(self.mainFont)
-        self.btnClear.clicked.connect(self.on_clear_clicked)
-        
-        formLayout = QVBoxLayout()
-        formLayout.addWidget(QLabel("First Name", font=self.mainFont))
-        formLayout.addWidget(self.tfFirstName)
-        formLayout.addWidget(QLabel("Last Name", font=self.mainFont))
-        formLayout.addWidget(self.tfLastName)
-        
-        buttonLayout = QHBoxLayout()
-        buttonLayout.addWidget(self.btnOk)
-        buttonLayout.addWidget(self.btnClear)
-        
-        mainLayout = QVBoxLayout()
-        mainLayout.addLayout(formLayout)
-        mainLayout.addWidget(self.lbWelcome)
-        mainLayout.addLayout(buttonLayout)
-        
-        centralWidget = QWidget()
-        centralWidget.setLayout(mainLayout)
-        self.setCentralWidget(centralWidget)
-        
-        self.setStyleSheet("background-color: rgb(128, 128, 255);")
-        
-    def on_ok_clicked(self):
-        firstName = self.tfFirstName.text()
-        lastName = self.tfLastName.text()
-        self.lbWelcome.setText("Hello " + firstName + " " + lastName)
-        
-    def on_clear_clicked(self):
-        self.tfFirstName.setText("")
-        self.tfLastName.setText("")
-        self.lbWelcome.setText("")
+        # Создание списка продуктов
+        self.product_list = QListWidget()
+        for product in products:
+            self.product_list.addItem(f"{product.name} - ${product.price}")
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    myFrame = MainFrame()
-    myFrame.show()
-    sys.exit(app.exec_())
+        # Создание поля для ввода наличности
+        self.money_field = QLineEdit()
+
+        # Создание кнопки "купить товар"
+        self.buy_button = QPushButton("Купить товар")
+
+        # Расположение компонентов на интерфейсе
+        main_layout = QVBoxLayout()
+        main_layout.addWidget(self.product_list)
+        main_layout.addWidget(self.money_field)
+        main_layout.addWidget(self.buy_button)
+
+        central_widget = QWidget()
+        central_widget.setLayout(main_layout)
+        self.setCentralWidget(central_widget)
+
+        # Обработка нажатия на кнопку "купить товар"
+        self.buy_button.clicked.connect(self.on_buy_button_clicked)
+
+    def on_buy_button_clicked(self):
+        selected_index = self.product_list.currentRow()
+        if selected_index != -1:
+            selected_item = self.product_list.currentItem().text()
+            # Разбиваем строку, чтобы получить имя продукта и его цену
+            product_name, product_price = selected_item.split(" - ")
+            product_price = float(product_price)
+
+            # Получаем введенную сумму из поля для ввода
+            entered_money = float(self.money_field.text())
+
+            # Проверяем, хватает ли денег для покупки товара
+            if entered_money >= product_price:
+                QMessageBox.information(self, "Покупка", f"Вы купили {product_name}")
+                # Обновляем баланс пользователя после покупки
+                self.money_field.setText(f"{entered_money - product_price}")
+            else:
+                QMessageBox.warning(self, "Ошибка", "Недостаточно средств")
+        else:
+            QMessageBox.warning(self, "Ошибка", "Выберите товар для покупки")
